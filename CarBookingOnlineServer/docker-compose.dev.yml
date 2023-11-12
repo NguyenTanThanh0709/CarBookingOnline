@@ -1,0 +1,36 @@
+version: "3.8"
+services:
+  mysql-springboot-container:
+    image: mysql:8.0.28
+    container_name: mysql-springboot-container
+    ports:
+      - 3310:3306
+    volumes:
+      - mysql-springboot-data:/var/lib/mysql
+      - mysql-springboot-config-deamond:/etc/mysql/conf.d
+    networks:
+      - backend
+    environment:
+      MYSQL_USER: hoangnd
+      MYSQL_PASSWORD: Abc@123456789
+      MYSQL_ROOT_PASSWORD: Abc@123456789
+      MYSQL_DATABASE: CarBookingOnline
+  springboot-docker-container:
+    image: nguyentanthanh0709/springboot-docker:v1.0.1
+    container_name: springboot-docker-container
+    ports:
+      - 8085:8083
+      - 5005:5005
+    volumes:
+      - ./:/app
+    networks:
+      - backend
+networks:
+  backend:
+    name: springboot-app-network
+    external: true
+volumes:
+  mysql-springboot-data:
+    driver: local
+  mysql-springboot-config-deamond:
+    driver: local

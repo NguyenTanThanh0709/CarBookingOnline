@@ -1,0 +1,59 @@
+- Pull and start/run a container
+
+
+
+
+docker run -dp 8085:8083 \
+--name springboot-docker-container \
+-v "$(pwd):/app" \
+nguyentanthanh0709/springboot-docker:v1.0.0
+
+
+docker run -dp 8085:8083 `
+--name springboot-docker-container `
+-v ${PWD}:/app `
+--network springboot-app-network `
+nguyentanthanh0709/springboot-docker:v1.0.0
+
+
+
+http://localhost:8085/api/test/ok
+
+docker logs springboot-docker-container
+
+docker restart springboot-docker-container
+
+docker network create springboot-app-network
+
+
+docker run --rm -d `
+-v mysql-springboot-data:/var/lib/mysql `
+-v mysql-springboot-config-deamod:etc/mysql/conf.d `
+--name mysql-springboot-container `
+-p 3310:3306 `
+-e MYSQL_USER=hoangnd `
+-e MYSQL_PASSWORD=Abc@123456789 `
+-e MYSQL_ROOT_PASSWORD=Abc@123456789 `
+-e MYSQL_DATABASE=CarBookingOnline `
+--network springboot-app-network `
+mysql:8.0.28
+
+
+
+docker rm -f mysql-springboot-container springboot-docker-container
+
+
+docker exec -ti mysql-springboot-container mysql -u root -p
+
+docker-compose -f docker-compose.dev.yml up -d --build
+
+
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Booking> bookings;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+        @JoinColumn(name = "id_user")
+        private User user;
+
+
