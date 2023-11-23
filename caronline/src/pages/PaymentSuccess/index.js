@@ -21,10 +21,7 @@ const PaymentSuccess = (props) => {
           <h2 className="my-2 text-4xl">Order Details</h2>
           <table className="table table-bordered">
             <tbody>
-              <tr>
-                <td>Order Information:</td>
-                <td>{orderId}</td>
-              </tr>
+
               <tr>
                 <td>Total Price:</td>
                 <td>{JSON.parse(Cookies.get("formData")).fareAmount}</td>
@@ -32,10 +29,6 @@ const PaymentSuccess = (props) => {
               <tr>
                 <td>Payment Time:</td>
                 <td>{currentDate.toDateString()}</td>
-              </tr>
-              <tr>
-                <td>Transaction ID:</td>
-                <td>{transactionId}</td>
               </tr>
             </tbody>
           </table>

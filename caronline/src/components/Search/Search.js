@@ -15,7 +15,7 @@ const containerStyle = {
 };
 
 
-function Search() {
+function Search({ onSearch }) {
     const navigate = useNavigate();
     const handleclickChuaphattrien = () => {
         alert("Tính năng đang trong giai đoạn phát triển! vui lòng chờ cập nhật mới nhất!")
@@ -79,7 +79,14 @@ function Search() {
             return
         }
         navigate(`${config.routes.listinfotrip}?${queryParams.toString()}`);
+
+        if (onSearch) {
+            onSearch(); // Call the onSearch function passed as a prop
+        }
       };
+
+
+
     
 
     return ( 

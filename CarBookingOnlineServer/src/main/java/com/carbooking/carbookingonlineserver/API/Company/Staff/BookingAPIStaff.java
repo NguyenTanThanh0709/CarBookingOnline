@@ -2,6 +2,7 @@ package com.carbooking.carbookingonlineserver.API.Company.Staff;
 
 import com.carbooking.carbookingonlineserver.dto.reponse.BookingReponse;
 import com.carbooking.carbookingonlineserver.entity.Booking;
+import com.carbooking.carbookingonlineserver.repository.BookingRepository;
 import com.carbooking.carbookingonlineserver.utils.BookingFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,5 +32,18 @@ public class BookingAPIStaff {
         }
         String Message = "Không thể upload file Booking!";
         return new ResponseEntity<>(Message, HttpStatus.BAD_REQUEST);
+    }
+
+    @Autowired
+    private BookingRepository bookingRepository;
+
+    @PatchMapping("booking/{id}/status")
+    public ResponseEntity<String> updateBookingStatusById(@PathVariable Long id, @RequestParam String status) {
+        try {
+            bookingRepository.updateStatusById(id, status);
+            return ResponseEntity.ok("Booking status updated successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error updating booking status: " + e.getMessage());
+        }
     }
 }

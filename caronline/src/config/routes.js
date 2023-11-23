@@ -9,6 +9,7 @@ const routes = {
     DoiMatKhau: '/doimatkhau',
     VeCuaToi: '/vecuatoi',
     DetailItem: '/detailitem',
+    Forgot: '/forgot',
 
     LoginCompany:'/managementstaff/logincompany',
     ManagementStaff:'/managementstaff/employee',

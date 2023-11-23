@@ -18,6 +18,11 @@ public interface BookingRepository extends JpaRepository<Booking,Long> {
     List<Booking> findByDriverTrip(DriverTrip driverTrip);
     List<Booking> findByUser(User user);
     List<Booking> findByUserAndDateAfter(User user, Date date);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE Booking b SET b.status = :status WHERE b.id = :id")
+    void updateStatusById(@Param("id") Long id, @Param("status") String status);
     @Modifying
     @Transactional
     @Query(value = "DELETE FROM booking_seat WHERE booking_id = :bookingId", nativeQuery = true)

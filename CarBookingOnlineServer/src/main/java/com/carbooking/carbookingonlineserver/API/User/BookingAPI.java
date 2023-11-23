@@ -3,6 +3,9 @@ package com.carbooking.carbookingonlineserver.API.User;
 import com.carbooking.carbookingonlineserver.dto.reponse.BookingReponse;
 import com.carbooking.carbookingonlineserver.dto.repuest.BookingRequest;
 import com.carbooking.carbookingonlineserver.entity.Booking;
+import com.carbooking.carbookingonlineserver.entity.Promotions;
+import com.carbooking.carbookingonlineserver.entity.Trip;
+import com.carbooking.carbookingonlineserver.repository.PromotionsRepository;
 import com.carbooking.carbookingonlineserver.service.BookingService;
 import com.carbooking.carbookingonlineserver.service.IMailService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +14,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/user")
@@ -76,6 +82,41 @@ public class BookingAPI {
         }
         String message = "Không lấy list Booking của user!";
         return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+    }
+
+    @Autowired
+    private PromotionsRepository promotionsRepository;
+
+    @GetMapping("/promotion/byCodeAndTripId/{code}/{tripId}")
+    public ResponseEntity<?> getPromotionByCodeAndTripId(@PathVariable String code, @PathVariable Long tripId) {
+        Optional<Promotions> promotion = promotionsRepository.findByCode(code);
+
+        if (promotion.isPresent()) {
+            if (isValidPromotionForTrip(promotion.get(), tripId,promotion.get().getStartDate(), promotion.get().getEndDate())) {
+                return new ResponseEntity<>(promotion.get(), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
+            }
+        } else {
+            return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    private boolean isValidPromotionForTrip(Promotions promotion, Long tripId, Date startDate, Date endDate) {
+        // Check if the promotion is valid for the given tripId
+        List<Trip> trips = promotion.getTrips();
+        LocalDate currentDate = LocalDate.now();
+        LocalDate startLocalDate = startDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate endLocalDate = endDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+        // Check if the current date is within the range
+
+        if((!currentDate.isBefore(startLocalDate) && !currentDate.isAfter(endLocalDate))&& (trips != null && trips.stream().anyMatch(trip -> trip.getId().equals(tripId)))){
+            return true;
+        }else {
+            return false;
+        }
+
     }
 
 }

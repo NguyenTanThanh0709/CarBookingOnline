@@ -1,16 +1,26 @@
-function Item() {
+import { useNavigate } from 'react-router-dom';
+
+function Item({ booking }) {
+    const navigate = useNavigate();
+
+    const onClick = (id) => {
+        navigate(`/detailitem?id=${id}`);
+    }
+
+    console.log(booking)
+
     return ( 
-        <div className="p-2 bg-red-100 cursor-pointer m-4">
+        <div onClick={() => onClick(booking.id)} className="p-2 bg-red-100 cursor-pointer m-4">
             <div className="m-2 p-2 flex justify-between ">
-                <p>CN,27/08/2023</p>
-                <p className="text-green-900 fw-bold">Đã thanh toán</p>
+                <p>${booking.drivertrip.date}</p>
+                <p className="text-green-900 fw-bold">${booking.status}</p>
             </div>
-            <div className="m-2 p-2">17:00</div>
-            <div className="m-2 p-2">Loan Sáng</div>
-            <div className="m-2 p-2">Đắk Lak - Hồ Chí Minh</div>
-            <div className="m-2 p-2">Biển Số Xe: AB123</div>
+            <div className="m-2 p-2">${booking.drivertrip.pickupTime}</div>
+            <div className="m-2 p-2">${booking.fareAmount}</div>
+            <div className="m-2 p-2">${booking.drivertrip.pickupLocation} - ${booking.drivertrip.dropoffLocation}</div>
+            <div className="m-2 p-2">Biển Số Xe: ${booking.car.id}</div>
         </div>
-     );
+    );
 }
 
 export default Item;

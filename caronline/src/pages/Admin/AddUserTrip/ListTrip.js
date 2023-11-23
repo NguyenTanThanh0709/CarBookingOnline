@@ -17,7 +17,13 @@ function ListTrip() {
   }
   const [selectedDay, setSelectedDay] = useState(null);
   const handleDateChange = (selectedDate) => {
-    setSelectedDay(selectedDate);
+
+    const tempdate = selectedDate.split("-");
+     const date = tempdate[1]+"/"+tempdate[2]+"/"+tempdate[0];
+    fetchDataListDriverAfterCurrentDate_(date);
+    console.log(date);
+
+
   };
   function getCurrentDateFormatted() {
     const currentDate = new Date();
@@ -35,6 +41,15 @@ function ListTrip() {
       const date = getCurrentDateFormatted();
       console.log(date)
       const data = await DriverTripAPI.getlistDriverTripAfterDateANDTRIP(date,tripId);
+      setTrips(data)
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  }
+
+  const fetchDataListDriverAfterCurrentDate_ = async (datetofilter) => {
+    try {
+      const data = await DriverTripAPI.getlistDriverTripAfterDateANDTRIP(datetofilter,tripId);
       setTrips(data)
     } catch (error) {
       console.error('Error fetching data:', error);

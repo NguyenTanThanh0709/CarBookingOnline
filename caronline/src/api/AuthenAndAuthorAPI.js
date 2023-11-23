@@ -16,6 +16,24 @@ const AuthenAndAuthorAPI = {
     logout :() =>{
         const url = '/api/v1/auth/logout';
         return axiosClient1.get(url);
+    },
+    updateUser : (phone,name,email) =>{
+        const url = `/api/v1/demo/update/${phone}?name=${name}&email=${email}`;;
+        return axiosClient1.put(url);
+    },
+    changePassword : (phone, passwordnew, passwordold) =>{
+        const url = `/api/v1/demo/password/${phone}?passwordnew=${passwordnew}&passwordold=${passwordold}`;
+        return axiosClient1.put(url);
+    },
+
+    getOne : (phone) =>{
+        const url = `/api/v1/demo/get/${phone}`;
+        return axiosClient1.get(url);
+    },
+
+    forgotPass : (email) => {
+        const url = `/api/v1/demo/forgot?email=${email}`;
+        return axiosClient1.post(url);
     }
 }
 

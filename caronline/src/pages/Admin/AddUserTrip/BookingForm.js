@@ -2,7 +2,7 @@
 import BookingAPI from '~/api/BookingAPI';
   const BookingForm = ( drivertrip ) => {
     const [formData, setFormData] = useState({
-        status: '',
+        status: 'Chưa Thanh Toán',
         idCar: '',
         listIdSeat: '',
         isProtect: false,
@@ -36,8 +36,6 @@ import BookingAPI from '~/api/BookingAPI';
     const diemden = drivertrip.booking.trip.dropoffLocation
 
 
-
-
     const handleInputChange = (e) => {
       const { name, value } = e.target;
       setFormData({
@@ -57,6 +55,10 @@ import BookingAPI from '~/api/BookingAPI';
 
     const fetchDataSubmit = async () => {
       try {
+        const myString = data.listIdSeat;
+        const wordsArray = myString.split("-");
+        const wordCount = wordsArray.length;
+        data.fareAmount = wordCount * data.fareAmount;
         const data = await BookingAPI.addOneBooking(formData);
         console.log(data)
         alert("Booking Thành Công!")

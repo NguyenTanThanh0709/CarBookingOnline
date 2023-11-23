@@ -16,10 +16,6 @@ function ManagementCompany() {
             <Tab eventKey="typecar" title="Quản Lý Loại Xe">
                 <TypeCar/>
             </Tab>
-            <Tab eventKey="doanhthu" title="Xem Doanh Thu">
-            
-            </Tab>
-            
             <Tab eventKey="comment" title="Bình Luận">
                 <Contact/>
             </Tab>

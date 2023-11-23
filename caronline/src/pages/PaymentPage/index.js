@@ -18,7 +18,8 @@ function PaymentPage() {
 
       const [data,setdata] = useState({})
       const [trip,settrip] = useState({})
-
+      const [pricediscount,setPricediscount] = useState(0)
+      const [wordCount,setCounut] = useState(1)
       
 
 
@@ -35,6 +36,10 @@ function PaymentPage() {
         if (formData) {
           const storedObject = JSON.parse(formData);
           setdata(storedObject);
+          const myString = storedObject.listIdSeat;
+          const wordsArray = myString.split("-");
+        const wordCount = wordsArray.length;
+        setCounut(wordCount)
         }
       }, []); // Empty dependency array ensures this effect runs only once after initial render
     
@@ -49,7 +54,13 @@ function PaymentPage() {
         }
         if(paymentMethod == 1){
             try {
-                data.status = "Đã Thanh toán"
+                data.status = "Đã Thanh Toán, Chưa Đi"
+                console.log(data)
+
+                
+                
+                
+                data.fareAmount = wordCount * data.fareAmount - pricediscount;
                 const data1 = await BookingAPI.addOneBooking(data);
                 console.log(data1)
                 navigate("/payment", { state: { id: data1.id, amount: data1.fareAmount } });
@@ -59,7 +70,7 @@ function PaymentPage() {
             
         }else{
             try {
-                data.status = "Chưa Thanh toán"
+                data.status = "Chưa Thanh Toán"
                 const data1 = await BookingAPI.addOneBooking(data);
                 console.log(data1)
                 alert("Booking Thành Công")
@@ -81,7 +92,34 @@ function PaymentPage() {
         navigate("/")
     }
 
+    const [promotionValue, setPromotionValue] = useState('');
 
+    const handlePromotionChange = (event) => {
+        setPromotionValue(event.target.value);
+    };
+
+    const handleApplyPromotion = () => {
+        // Do something with the promotionValue
+        console.log('Applied promotion:', promotionValue);
+        fetchDataTRIPs();
+        // Add your logic here, such as sending the value to the server or performing some action.
+      };
+
+      
+
+
+      const fetchDataTRIPs = async () => {
+        try {
+          const data_ = await BookingAPI.promotion(JSON.parse(Cookies.get("driverTrip")).id,promotionValue);
+          console.log(data_);
+          setPricediscount(data_.discountAmount)
+          alert("OK");
+        } catch (error) {
+          console.error('Error fetching data:', error);
+          alert('Mã khuyến mãi không hợp lệ');
+        }
+      };
+  
 
     return ( 
 
@@ -145,15 +183,15 @@ function PaymentPage() {
 
                         <div className="m-2 p-2 ">
                             <span className="text-purple-700 text-opacity-50 fs-4">Nhà Xe</span>
-                            <p>{JSON.parse(Cookies.get("driverTrip")).trip.phoneCompany.name}</p>
+                            <p>{JSON.parse(Cookies.get("driverTrip")).phoneCompany.name}</p>
                         </div>
                         <div className="m-2 p-2 ">
                             <span className="text-purple-700 text-opacity-50 fs-4">Dự kiến đón</span>
-                            <p>{JSON.parse(Cookies.get("pickup")).time} ...  {JSON.parse(Cookies.get("driverTrip")).date} {JSON.parse(Cookies.get("pickup")).detailLocation}</p>
+                            <p>{JSON.parse(Cookies.get("pickup")).time} ...  {JSON.parse(Cookies.get("date"))} {JSON.parse(Cookies.get("pickup")).detailLocation}</p>
                         </div>
                         <div className="m-2 p-2 ">
                             <span className="text-purple-700 text-opacity-50 fs-4">Dự kiến trả</span>
-                            <p>{JSON.parse(Cookies.get("dropoff")).time} ...  {JSON.parse(Cookies.get("driverTrip")).date} {JSON.parse(Cookies.get("dropoff")).detailLocation} </p>
+                            <p>{JSON.parse(Cookies.get("dropoff")).time} ...  {JSON.parse(Cookies.get("date"))} {JSON.parse(Cookies.get("dropoff")).detailLocation} </p>
                         </div>
 
                     </div>
@@ -161,8 +199,11 @@ function PaymentPage() {
                     <div className="border-2 border-blue-500 border-opacity-75 md:border-opacity-50 m-2 p-2">
                         <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
                             <label className="block text-gray-700 fs-2 font-bold mb-2">
-                                <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="text" name="name" />
-                                <button class="flex-shrink-0 bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 mt-2 border-4 text-white py-1 px-2 rounded" type="button">
+                                <input
+                                value={promotionValue}
+                                onChange={handlePromotionChange}
+                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="text" name="promotion" />
+                                <button onClick={handleApplyPromotion} class="flex-shrink-0 bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 mt-2 border-4 text-white py-1 px-2 rounded" type="button">
                                     Áp Dụng
                                 </button>
                             </label>
@@ -173,7 +214,7 @@ function PaymentPage() {
                     <Row className="m-2 p-2">
                         <Col className="flex justify-content-between">
                             <span>Tổng Tiền</span>
-                            <span>400.000 <span> Đ</span></span>
+                            <span>{data.fareAmount * wordCount -pricediscount} <span> Đ</span></span>
                         </Col>
                     </Row>
                     </div>

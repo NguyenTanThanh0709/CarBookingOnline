@@ -243,7 +243,7 @@ function DetailLocation() {
               <option value="">Select a trip</option>
               {trips.map((trip) => (
                 <option key={trip.id} value={trip.id}>
-                 Địa chỉ đi:   {trip.pickupLocation} -- Địa chỉ đến: {trip.dropoffLocation}
+                 Địa chỉ đi:   {trip.pickupLocation} -- Địa chỉ đến: {trip.dropoffLocation} -- Giờ đi: {trip.pickupTime} -- Giờ đến: {trip.dropoffTime}
                 </option>
               ))}
             </select>

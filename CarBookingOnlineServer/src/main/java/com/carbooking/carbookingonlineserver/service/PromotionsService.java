@@ -7,8 +7,6 @@ import java.util.List;
 
 public interface PromotionsService {
     Promotions addOne(PromotionsRequest promotionsRequest);
-    Promotions editOne(Long id, PromotionsRequest promotionsRequest);
-    Boolean updateStatus(Long id, Boolean status);
     List<Promotions> getAllOffComapny(String PhoneCompany);
     Promotions getOne(Long id);
 }

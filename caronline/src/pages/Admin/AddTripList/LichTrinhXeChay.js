@@ -34,14 +34,32 @@ function LichTrinhXeChay() {
       console.error('Error fetching data:', error);
     }
   };
+
+  const [typeCar, setTypeCar] = useState(new Map());
+  const addKeyValue = (key, value) => {
+    // Check if the key already exists
+    if (!typeCar.has(key)) {
+      // If not, update the state with the new key-value pair
+      setTypeCar(new Map(typeCar.set(key, value)));
+    } else {
+      // If the key already exists, handle it as you see fit
+      console.error('Key already exists:', key);
+    }
+  };
+
   const fetchDataCARs = async () => {
     try {
       const data = await CarAPI.getlist(JSON.parse(Cookies.get('company')).phone);
       setCars(data);
+      console.log(data)
+      {data.map((car) => (
+        addKeyValue(car.typeCar.id,car.typeCar.name)
+      ))}
       // console.log(data)
     } catch (error) {
       console.error('Error fetching data:', error);
     }
+    console.log(typeCar)
   };
   const fetchDataDRIVERs = async () => {
     try {
@@ -309,6 +327,18 @@ function LichTrinhXeChay() {
       setIsModalOpen(false);
     };
 
+    const [isModalOpen__, setIsModalOpen__] = useState(false);
+
+  const openModal__ = () => {
+      setIsModalOpen__(true);
+    };
+
+    const closeModal__ = () => {
+      setIsModalOpen__(false);
+    };
+
+
+
     const handleAdd_ = () =>{
       setFormData({
         id: '',
@@ -321,6 +351,27 @@ function LichTrinhXeChay() {
       setIsEditing(false);
       openModal();
     }
+
+    const handleAdd__ = () =>{
+      setFormData_({
+        phoneCompany: JSON.parse(Cookies.get('company')).phone,
+        idTrip: '',
+        start: '',
+        end: '',
+        typecar: ''
+      })
+      openModal__();
+
+    }
+
+
+    const [formData_, setFormData_] = useState({
+      phoneCompany: JSON.parse(Cookies.get('company')).phone,
+      idTrip: '',
+      start: '',
+      end: '',
+      typecar: ''
+    });
 
 // Hàm định dạng ngày MM/dd/yyyy
 function formatDate(date) {
@@ -459,7 +510,37 @@ const isFormDataValidUpdate = () => {
     setIsModalOpen_(false);
   };
 
+  const handleInputChange__ = (e) => {
+    const { name, value } = e.target;
+    setFormData_({ ...formData_, [name]: value });
+  };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    // Perform the action you want with the form data, e.g., make a POST request
+
+    if(formData_.start.split("-").length > 1 && formData_.end.split("-").length > 1){
+
+      const start = formData_.start.split("-");
+      formData_.start =  start[1]+"/"+start[2] + "/" + start[0];
+  
+      const end = formData_.end.split("-");
+      formData_.end = end[1]+"/"+end[2] + "/" +  end[0];
+    }
+    console.log('Form data submitted:', formData_);
+    try {
+      const response = await DriverTripAPI.addAutomatic(formData_);
+      console.log(response)
+      alert("Thêm thành công!")
+      setTripdriver((prevTypecars) => [...prevTypecars, ...response]);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      alert("Thêm không thành công!")
+    }
+
+
+    
+  };
 
   return (
     <div>
@@ -487,7 +568,7 @@ const isFormDataValidUpdate = () => {
               <option value="">Select a Trip</option>
               {trips.map((trip) => (
                 <option key={trip.id} value={trip.id}>
-                  {trip.pickupLocation} - {trip.dropoffLocation}
+                  {trip.pickupLocation} - {trip.dropoffLocation} -- Giờ đi: {trip.pickupTime} -- Giờ đến: {trip.dropoffTime}
                 </option>
               ))}
             </select>
@@ -503,6 +584,13 @@ const isFormDataValidUpdate = () => {
             onClick={handleAdd_}
             className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded">
               Thêm Tuyến đường
+      </button>
+      <br/>
+
+      <button
+            onClick={handleAdd__}
+            className="bg-blue-500 hover:bg-blue-400 my-2 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded">
+              Thêm Tuyến đường tự động
       </button>
 
       <div className="flex m-2 p-2 items-center space-x-2">
@@ -541,11 +629,11 @@ const isFormDataValidUpdate = () => {
           {tripdriver.map((item) => (
             <tr key={item.id}>
               <td className="border px-4 py-2">{item.id}</td>
-              <td className="border px-4 py-2">{item.date}</td>
+              <td className="border px-4 py-2">{format(new Date(item.date), "yyyy-MM-dd HH:mm:ss")}</td>
               <td className="border px-4 py-2">{item.status ? 'Active' : 'Inactive'}</td>
-              <td className="border px-4 py-2">{item.trip.pickupLocation} đến {item.trip.dropoffLocation}</td>
+              <td className="border px-4 py-2">{item.trip.pickupLocation} đến {item.trip.dropoffLocation} -- Giờ đi: {item.trip.pickupTime} -- Giờ đến: {item.trip.dropoffTime}</td>
               <td className="border px-4 py-2">{item.car.id}</td>
-              <td className="border px-4 py-2">{item.userDriverTrips.map(item1 => item1.user.name).join(', ')}</td>
+              <td className="border px-4 py-2">{item.userDriverTrips ? item.userDriverTrips.map(item1 => item1.user.name).join(', ') : ""}</td>
               <td className="border px-4 py-2">
               <>
                     <button
@@ -665,7 +753,7 @@ const isFormDataValidUpdate = () => {
               <option value="">Select a Trip</option>
               {trips.map((trip) => (
                 <option key={trip.id} value={trip.id}>
-                  {trip.pickupLocation} - {trip.dropoffLocation}
+                  {trip.pickupLocation} - {trip.dropoffLocation} -- Giờ đi: {trip.pickupTime} -- Giờ đến: {trip.dropoffTime}
                 </option>
               ))}
             </select>
@@ -747,6 +835,106 @@ const isFormDataValidUpdate = () => {
             </div>
       </Modal>
 
+      <Modal
+        isOpen={isModalOpen__}
+        onRequestClose={closeModal__}
+        contentLabel="Tự Độnh"
+        style={{
+          overlay: {
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          },
+          content: {
+            border: 'none',
+            borderRadius: '10px',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '1000px',
+            height: '550px',
+          
+          },
+        }}
+>
+
+<form onSubmit={handleSubmit} className="max-w-md mx-auto mt-8">
+  <div className="mb-4">
+    <label htmlFor="phoneCompany" className="block text-gray-700  font-bold mb-2">Số điện thoại nhà xe:</label>
+    <input
+      type="text"
+      id="phoneCompany"
+      name="phoneCompany"
+      readOnly={true}
+      value={JSON.parse(Cookies.get('company')).phone}
+      onChange={handleInputChange__}
+      className="w-full border p-2"
+    />
+  </div>
+
+  <div className="mb-4">
+    <label htmlFor="idTrip" className="block text-gray-700  font-bold mb-2">Tuyến đường:</label>
+    <select
+      id="idTrip"
+      name="idTrip"
+      value={formData_.idTrip}
+      onChange={handleInputChange__}
+      className="w-full border p-2"
+    >
+      <option value="">Select a Trip</option>
+              {trips.map((trip) => (
+                <option key={trip.id} value={trip.id}>
+                  {trip.pickupLocation} - {trip.dropoffLocation}({trip.pickupTime}-{trip.dropoffTime})
+                </option>
+              ))}
+    </select>
+  </div>
+
+  <div className="mb-4">
+    <label htmlFor="start" className="block text-gray-700  font-bold mb-2">Ngày bắt đầu:</label>
+    <input
+      type="date"
+      id="start"
+      name="start"
+      value={formData_.start}
+      onChange={handleInputChange__}
+      className="w-full border p-2"
+    />
+  </div>
+
+  <div className="mb-4">
+    <label htmlFor="end" className="block text-gray-700  font-bold mb-2">Ngày kết thúc:</label>
+    <input
+      type="date"
+      id="end"
+      name="end"
+      value={formData_.end}
+      onChange={handleInputChange__}
+      className="w-full border p-2"
+    />
+  </div>
+
+  <div className="mb-4">
+    <label htmlFor="typecar" className="block text-gray-700  font-bold mb-2">Loại xe (nhà xe phải có xe thuộc loại dưới):</label>
+    <select
+      id="typecar"
+      name="typecar"
+      value={formData_.typecar}
+      onChange={handleInputChange__}
+      className="w-full border p-2"
+    >
+      <option value="">Select Type Car</option>
+      {[...typeCar].map(([key, value]) => (
+          <option key={key} value={key}>
+          {value}
+        </option>
+        ))}
+      {/* Add more options as needed */}
+    </select>
+  </div>
+
+  <button type="submit" className="bg-blue-500 text-white p-2 rounded hover:bg-blue-700">Submit</button>
+</form>
+
+</Modal>
       <Modal
         isOpen={isModalOpen_}
         onRequestClose={closeModal_}

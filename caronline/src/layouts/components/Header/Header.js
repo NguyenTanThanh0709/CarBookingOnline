@@ -37,6 +37,7 @@ const navigate = useNavigate();
     Cookies.remove('access_token');
     // Đóng modal
     setIsModalOpen(false);
+    alert("Đăng xuất thành công!")
     navigate('/')
   };
   const company_ = Cookies.get('role');
@@ -56,12 +57,15 @@ const navigate = useNavigate();
     navigate('/vecuatoi')
   }
 
+  const back = () =>{
+    navigate('/')
+  }
   return (
     <Row className='mt-2'>
       <Col xs lg='3' className='flex justify-content-center'>
-        <a href='/'>
+        <span className='cursor-pointer' onClick={back}>
           <img className={cx('logo')} src={images.logo} alt='Logo' />
-        </a>
+        </span>
         <h2 className='text-uppercase ml-4 pt-5 fw-bold text-light'>
           Cam kết hoàn 150% nếu nhà xe không giữ vé
         </h2>
@@ -72,7 +76,7 @@ const navigate = useNavigate();
         <h3>Mở bán vé trên Vexere</h3>
         <h3>Trở thành đối tác</h3>
       </Col>
-      <Col xs lg='2' pt='6' ml='5'>
+      <Col xs lg='2' pt='6' ml='5' className='mt-4'>
         {company_ ? (
           <img
             onClick={toggleModal}
@@ -84,7 +88,7 @@ const navigate = useNavigate();
             to={config.routes.login}
             type='button'
             className={cx('buttonLogin')}
-            class='bg-red-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
+            class='bg-red-500  hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
           >
             Login
           </Button>

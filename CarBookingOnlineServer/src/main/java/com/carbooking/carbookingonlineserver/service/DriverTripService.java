@@ -25,5 +25,7 @@ public interface DriverTripService {
 
     void deleteSeat(Long id);
 
+    List<DriverTrip> addListBetweenDay(String phoneCompany,Long idTrip,String start, String end, Long typecar);
+
 
 }

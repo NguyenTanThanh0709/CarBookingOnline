@@ -3,7 +3,11 @@ package com.carbooking.carbookingonlineserver.API.VNP;
 import com.carbooking.carbookingonlineserver.VNPAY.VNPayConfig;
 import com.carbooking.carbookingonlineserver.entity.Booking;
 import com.carbooking.carbookingonlineserver.entity.Payment;
+import com.carbooking.carbookingonlineserver.entity.Seat;
+import com.carbooking.carbookingonlineserver.repository.BookingRepository;
 import com.carbooking.carbookingonlineserver.service.BookingService;
+import com.carbooking.carbookingonlineserver.service.DriverTripService;
+import com.carbooking.carbookingonlineserver.service.IMailService;
 import com.carbooking.carbookingonlineserver.service.PaymentService;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -20,45 +24,38 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-@org.springframework.stereotype.Controller
+@RestController
+@RequestMapping("/api/v1/user")
 @CrossOrigin(origins = "http://localhost:3000")
 public class vnpayRefund {
 
     @Autowired
+    private BookingRepository bookingRepository;
+    @Autowired
     private BookingService bookingService;
     @Autowired
-    private PaymentService paymentService;
+    private DriverTripService driverTripService;
+
+    @Autowired
+    private IMailService mailService;
 
     @PostMapping("/refund")
     public String refundPayment(
-            @RequestParam("idbooking") Long idbooking
-                                ) throws IOException {
-
-//        @RequestParam("trantype") String trantype,
-//        @RequestParam("order_id") String orderId,
-//        @RequestParam("amount") long amountt,
-//        @RequestParam("trans_date") String transDate,
-//        @RequestParam("user") String user
-
-
-
-        Payment payment=   paymentService.findPaymentByBooking(idbooking);
-        String trantype = payment.getTrantype();
-        String orderId = payment.getOrderId();
-        long longValue = Long.parseLong(payment.getAmountt());
-        String transDate = payment.getTransDate();
-        String user = payment.getBooking().getUser().getPhone();
-
-        // Initialize your refund parameters
+            @RequestParam("bookingid") Long bookingid,
+            @RequestParam("orderId") String orderId,
+            @RequestParam("amountt") long amountt,
+            @RequestParam("transDate") String transDate,
+            @RequestParam("user") String user
+    ) throws IOException {
         String vnp_RequestId = VNPayConfig.getRandomNumber(8);
         String vnp_Version = "2.1.0";
         String vnp_Command = "refund";
         String vnp_TmnCode = VNPayConfig.vnp_TmnCode;
-        String vnp_TransactionType = trantype;
+        String vnp_TransactionType = "03";
         String vnp_TxnRef = orderId;
-        long amount = (long) (longValue * 100 * 0.7);
+        long amount = (long) (amountt  * 0.7);
         String vnp_Amount = String.valueOf(amount);
-        String vnp_OrderInfo = "Hoan tien GD OrderId:" + vnp_TxnRef;
+        String vnp_OrderInfo = "Hoan tien GD OrderId:" + orderId;
         String vnp_TransactionNo = ""; // Assuming value of the parameter "vnp_TransactionNo" does not exist on your system.
         String vnp_TransactionDate = transDate;
         String vnp_CreateBy = user;
@@ -76,9 +73,9 @@ public class vnpayRefund {
         vnp_Params.addProperty("vnp_Amount", vnp_Amount);
         vnp_Params.addProperty("vnp_OrderInfo", vnp_OrderInfo);
 
-        if (vnp_TransactionNo != null && !vnp_TransactionNo.isEmpty()) {
-            vnp_Params.addProperty("vnp_TransactionNo", "{get value of vnp_TransactionNo}");
-        }
+//        if (vnp_TransactionNo != null && !vnp_TransactionNo.isEmpty()) {
+//            vnp_Params.addProperty("vnp_TransactionNo", "{get value of vnp_TransactionNo}");
+//        }
 
         vnp_Params.addProperty("vnp_TransactionDate", vnp_TransactionDate);
         vnp_Params.addProperty("vnp_CreateBy", vnp_CreateBy);
@@ -132,14 +129,29 @@ public class vnpayRefund {
 
             if ("00".equals(resultCode)) {
                 System.out.println("Hoàn tiền thành công");
+                Booking booking = bookingService.getBookingById(bookingid);
+                if(booking != null){
+                    for (Seat seat: booking.getSeats()){
+                        driverTripService.deleteSeat(seat.getId());
+                    }
+                    bookingService.deleteBookingSeatByBookingId(booking.getId());
+                    bookingRepository.updateStatusById(bookingid,"Bị Hủy");
+                }
+
+                try {
+                    mailService.senMailRenfund(booking.getUser().getEmail());
+                }catch (Exception e){
+                    System.out.println(e.getMessage());
+                }
                 // Thực hiện các hành động sau khi hoàn tiền thành công
-                paymentService.UpdateStatusPayment(idbooking,"Hoàn Tiền Thành Công và Hủy Vé!");
-                return "redirect:http://localhost:3000/payment/success";
+//                paymentService.UpdateStatusPayment(idbooking,"Hoàn Tiền Thành Công và Hủy Vé!");
+                return "succsess";
             } else {
                 System.out.println("Hoàn tiền thất bại");
                 // Thực hiện các hành động sau khi hoàn tiền thất bại
-                return "redirect:http://localhost:3000/payment/fail";
+                return "fail";
             }
         }
     }
+
 }

@@ -26,6 +26,7 @@ import ThongTinTaiKhoan from '~/pages/ThongTinTaiKhoan';
 import DoiMatKhau from '~/pages/DoiMatKhau';
 import VeCuaToi from '~/pages/VeCuaToi';
 import detailItem from '~/pages/VeCuaToi/detailItem';
+import Forgot from '~/pages/Forgotpass';
 
 
 const publicRoutes = [
@@ -66,6 +67,8 @@ const publicRoutes = [
     { path: config.routes.Payment, component: Payment, layout: null },
     { path: config.routes.PaymentFail, component: PaymentFailed, layout: null },
     { path: config.routes.PaymentSuccess, component: PaymentSuccess, layout: null },
+    { path: config.routes.Forgot, component: Forgot , layout: null},
+
 ];
 
 const privateRoutes = [];

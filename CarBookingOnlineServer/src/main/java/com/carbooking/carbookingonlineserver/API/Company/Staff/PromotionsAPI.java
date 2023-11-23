@@ -2,13 +2,19 @@ package com.carbooking.carbookingonlineserver.API.Company.Staff;
 
 import com.carbooking.carbookingonlineserver.dto.repuest.PromotionsRequest;
 import com.carbooking.carbookingonlineserver.entity.Promotions;
+import com.carbooking.carbookingonlineserver.entity.Trip;
+import com.carbooking.carbookingonlineserver.repository.PromotionsRepository;
 import com.carbooking.carbookingonlineserver.service.PromotionsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/staff")
@@ -16,6 +22,7 @@ import java.util.List;
 public class PromotionsAPI {
     @Autowired
     private PromotionsService promotionsService;
+
 
     @PostMapping("/promotion")
     public ResponseEntity<Promotions> createPromotion(@RequestBody PromotionsRequest promotionsRequest) {
@@ -37,25 +44,6 @@ public class PromotionsAPI {
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Promotions> updatePromotion(@PathVariable Long id, @RequestBody PromotionsRequest promotionsRequest) {
-        Promotions updatedPromotion = promotionsService.editOne(id, promotionsRequest);
-        if (updatedPromotion != null) {
-            return new ResponseEntity<>(updatedPromotion, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @PatchMapping("/{id}")
-    public ResponseEntity<?> updatePromotionStatus(@PathVariable Long id, @RequestBody Boolean status) {
-        boolean updated = promotionsService.updateStatus(id, status);
-        if (updated) {
-            return new ResponseEntity<>(HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
 
 
     @GetMapping("/promotion/company/{phoneCompany}")
@@ -67,5 +55,7 @@ public class PromotionsAPI {
         String Message = "Không tìm thấy!";
         return new ResponseEntity<>(Message, HttpStatus.NOT_FOUND);
     }
+
+
 
 }

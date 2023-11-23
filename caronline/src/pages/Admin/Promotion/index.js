@@ -1,57 +1,28 @@
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import TripCheckbox from './TripCheckbox';
 import { Row, Col } from 'react-bootstrap';
+import TripAPI from '~/api/TripAPI';
+import Cookies from 'js-cookie';
+import { tr } from 'date-fns/locale';
+import DriverTripAPI from '~/api/DriverTripAPI';
 
-const promotions = [
-    {
-      id: 1,
-      code: 'PROMO123',
-      description: '50% off on all products',
-      discountAmount: '50.00',
-      status: 'Active',
-      startDay: '2023-10-01',
-      endDay: '2023-10-31',
-    },
-    // Add more promotions as needed
-  ];
-
-  const tripsByPromotion = [
-    {
-      promotionId: 1,
-      tripId: 101,
-      pickupLocation: 'Location A',
-      dropoffLocation: 'Location B',
-      // Add trip details as needed
-    },
-    {
-        promotionId: 2,
-        tripId: 102,
-        pickupLocation: 'Location A',
-        dropoffLocation: 'Location B',
-        // Add trip details as needed
-      },
-    // Add more trip details as needed
-  ];
-
-
-  const trips = [
-    {
-      id: 1,
-      location: 'Location A',
-      // Add more trip details as needed
-    },
-    {
-      id: 2,
-      location: 'Location B',
-      // Add more trip details as needed
-    },
-    // Add more trips as needed
-  ];
-  
+   
 
 function Promotion() {
+
+  const [formData, setFormData] = useState({
+    id: '',
+    code: '',
+    description: '',
+    discountAmount: '',
+    trips: '',
+    company: JSON.parse(Cookies.get('company')).phone,
+    startDate: '',
+    endDate: '',
+});
+
     const [selectedTrips, setSelectedTrips] = useState([]);
 
     const handleCheckboxChange = (event) => {
@@ -64,11 +35,120 @@ function Promotion() {
     };
 
 
+    const [ trips,setTrips]  = useState([])
+    
+    const [  promotions ,setPromotions]  = useState([])
+
+    const fetchDataTRIPs = async () => {
+      try {
+        const data = await TripAPI.getlist(JSON.parse(Cookies.get('company')).phone);
+        setTrips(data);
+        console.log(data)
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    const fetchPromotion = async () => {
+      try {
+        const data = await DriverTripAPI.postpromotion(formData)
+
+        console.log(data)
+        alert("DONE!");
+        setFormData({
+          id: '',
+          code: '',
+          description: '',
+          discountAmount: '',
+          trips: '',
+          company: JSON.parse(Cookies.get('company')).phone,
+          startDate: '',
+          endDate: '',
+      });
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    const fetchPromotiongetData = async () => {
+
+      try {
+        const data = await DriverTripAPI.getPromotionList(JSON.parse(Cookies.get('company')).phone)
+        setPromotions(data)
+        
+        console.log(data)
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+
+  
+    useEffect(() => {
+      fetchDataTRIPs();
+    },[]);
+
+
+    const handleInputChange = (event) => {
+      const { name, value } = event.target;
+      setFormData({ ...formData, [name]: value });
+  };
+
+  const isFormDataValid = () => {
+    for (const key in formData) {
+        // Skip the check for the 'id' field
+        if (key === 'id') continue;
+
+        if (formData[key] === null || formData[key] === undefined || formData[key] === '') {
+            return false; // Invalid if any field is null, undefined, or empty
+        }
+    }
+    return true; // All fields are valid
+};
+
+const generateRandomCode = () => {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let code = '';
+
+  for (let i = 0; i < 5; i++) {
+      const randomIndex = Math.floor(Math.random() * characters.length);
+      code += characters.charAt(randomIndex);
+  }
+
+  return code;
+};
+
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    formData.trips = selectedTrips.join('-');
+    formData.company = JSON.parse(Cookies.get('company')).phone
+    formData.code = generateRandomCode()+JSON.parse(Cookies.get('company')).phone
+    
+
+    if (isFormDataValid()) {
+
+      console.log(formData)
+      console.log(selectedTrips)
+      fetchPromotion();
+
+      
+  } else {
+      // Handle the case where not all fields are valid
+      alert('Please fill in all required fields.');
+  }
+};
+
   return (
     <Tabs
       defaultActiveKey="profile"
       id="uncontrolled-tab-example"
       className="mb-3"
+      onSelect={(selectedKey) => {
+        if (selectedKey === 'see') {
+          fetchPromotiongetData();
+        }
+      }}
     >
       <Tab eventKey="add" title="Khuyến Mãi">
         <div className="mt-6 mx-4">
@@ -76,19 +156,7 @@ function Promotion() {
             <Row>
                 <Col>
                 <h2 className="text-2xl font-semibold mb-4">Khuyến mãi</h2>
-        <form className="w-full max-w-lg">
-            <div className="mb-4">
-            <label htmlFor="code" className="block text-gray-700 font-bold mb-2">
-                Mã Khuyến mãi (code)
-            </label>
-            <input
-                type="text"
-                id="code"
-                name="code"
-                className="border rounded w-full py-2 px-3"
-                placeholder="Enter promotion code"
-            />
-            </div>
+        <form onSubmit={handleSubmit} className="w-full max-w-lg">
             <div className="mb-4">
             <label htmlFor="description" className="block text-gray-700 font-bold mb-2">
                 Mô tả: 
@@ -99,6 +167,8 @@ function Promotion() {
                 className="border rounded w-full py-2 px-3"
                 placeholder="Enter promotion description"
                 rows="4"
+                value={formData.description}
+                onChange={handleInputChange}
             />
             </div>
             <div className="mb-4">
@@ -111,20 +181,9 @@ function Promotion() {
                 name="discountAmount"
                 className="border rounded w-full py-2 px-3"
                 placeholder="Enter discount amount"
+                value={formData.discountAmount}
+                onChange={handleInputChange}
             />
-            </div>
-            <div className="mb-4">
-            <label htmlFor="status" className="block text-gray-700 font-bold mb-2">
-                Trạng thái
-            </label>
-            <select
-                id="status"
-                name="status"
-                className="border rounded w-full py-2 px-3"
-            >
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-            </select>
             </div>
             <div className="mb-4">
             <label htmlFor="startDay" className="block text-gray-700 font-bold mb-2">
@@ -132,8 +191,10 @@ function Promotion() {
             </label>
             <input
                 type="date"
-                id="startDay"
-                name="startDay"
+                id="startDate"
+                name="startDate"
+                value={formData.startDate}
+                onChange={handleInputChange}
                 className="border rounded w-full py-2 px-3"
             />
             </div>
@@ -143,8 +204,10 @@ function Promotion() {
             </label>
             <input
                 type="date"
-                id="endDay"
-                name="endDay"
+                id="endDate"
+                value={formData.endDate}
+                onChange={handleInputChange}
+                name="endDate"
                 className="border rounded w-full py-2 px-3"
             />
             </div>
@@ -204,17 +267,17 @@ function Promotion() {
                     <td className="border px-4 py-2">{promotion.code}</td>
                     <td className="border px-4 py-2">{promotion.description}</td>
                     <td className="border px-4 py-2">{promotion.discountAmount}</td>
-                    <td className="border px-4 py-2">{promotion.startDay}</td>
-                    <td className="border px-4 py-2">{promotion.endDay}</td>
+                    <td className="border px-4 py-2">{promotion.startDate}</td>
+                    <td className="border px-4 py-2">{promotion.endDate}</td>
                     <td className="border px-4 py-2">
                         <select
                         >
                         <option value={null}>danh sách tuyến</option>
 
-                        {tripsByPromotion
+                        {promotion.trips
                             .map((trip) => (
-                            <option key={trip.tripId} value={trip.tripId}>
-                                Trip {trip.tripId}
+                            <option key={trip.id} value={trip.id}>
+                                Trip {trip.pickupLocation} -{trip.dropoffLocation}
                             </option>
                             ))}
                         </select>

@@ -70,7 +70,6 @@ return JSON.stringify(jsonObject);
       setLoginStatus('success');
       console.log(response);
       Cookies.set('access_token', response.access_token, { expires: 7});
-      Cookies.set('refresh_token', response.refresh_token, { expires: 7});
       Cookies.set('role', response.role, { expires: 7});
       Cookies.set('phone', response.phone, { expires: 7 });
       Cookies.set('email', response.email, { expires: 7 });
@@ -152,6 +151,10 @@ return JSON.stringify(jsonObject);
     // You can send the data to your backend or perform any other actions.
   };
 
+  const forgot = () =>{
+    navigate("/forgot")
+  }
+
   return (
     <MDBContainer className="p-3 my-5 d-flex flex-column w-50">
       <MDBTabs pills justify className="mb-3 d-flex flex-row justify-content-between">
@@ -196,9 +199,7 @@ return JSON.stringify(jsonObject);
           <div>
             <div className="flex items-center justify-between">
               <label htmlFor="password" className="block  font-medium leading-6 text-gray-900">Password</label>
-              <div className="">
-                <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">Forgot password?</a>
-              </div>
+              
             </div>
             <div className="mt-2">
               <input
@@ -219,6 +220,9 @@ return JSON.stringify(jsonObject);
             </button>
           </div>
         </form>
+        <div className="">
+                <span onClick={forgot} className=" cursor-pointer font-semibold text-indigo-600 hover:text-indigo-500">Forgot password?</span>
+        </div>
 
         <p className="mt-10 text-center  text-gray-500">
           Not a member?

@@ -8,40 +8,118 @@ function ListInfoTrip() {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
 
-    const dateTEMP = searchParams.get('date');
-    const split = dateTEMP.split('-');
-    const year = split[0];
-    const month = split[1];
-    const date = split[2]
-
-    const dateformat = month+"/" + date + "/" + year
-    const locatestart = searchParams.get('locatestart');
-    const locateend = searchParams.get('locateend');
-
-
-    const [selectedOption, setSelectedOption] = useState('1'); // Initialize the selected option
-    const handleChange = (event) => {
-        setSelectedOption(event.target.value);
+    const handleClickSearch = () => {
+        
+        fectdatagetDriverTripByDateAndLocateAll();
     };
 
+    const [dateformat, setDateformat] = useState('');
+    const [locatestart, setLocatestart] = useState('');
+    const [locateend, setLocateend] = useState('');
+
+    useEffect(() => {
+        const dateTEMP = searchParams.get('date');
+        const split = dateTEMP.split('-');
+        const year = split[0];
+        const month = split[1];
+        const date = split[2];
+
+        const formattedDate = month + "/" + date + "/" + year;
+        setDateformat(formattedDate);
+
+        setLocatestart(searchParams.get('locatestart') || '');
+        setLocateend(searchParams.get('locateend') || '');
+    }, [location.search]);
+
+
+
+    const [selectedOption, setSelectedOption] = useState('1');
+    const handleChange = (event) => {
+        setSelectedOption(event.target.value);
+        console.log(event.target.value);
+        let sortedData = [...driverTrips]; 
+        if(event.target.value == '4'){
+            sortedData.sort((a, b) => b.trip.price - a.trip.price);
+        }else if(event.target.value == '5'){
+            sortedData.sort((a, b) => a.trip.price - b.trip.price);
+        }else if(event.target.value == '2'){
+            sortedData.sort((a, b) => compareTime(a.trip.pickupTime, b.trip.pickupTime));
+
+        }else if(event.target.value == '3'){
+            sortedData.sort((a, b) => compareTime(b.trip.pickupTime, a.trip.pickupTime));
+        }else if(event.target.value == '1'){
+            fectdatagetDriverTripByDateAndLocateAll();
+        }
+
+
+        setDriverTrips(sortedData);
+    };
+
+    const compareTime = (time1, time2) => {
+        const [hours1, minutes1] = time1.split(':').map(Number);
+        const [hours2, minutes2] = time2.split(':').map(Number);
+      
+        if (hours1 === hours2) {
+          return minutes1 - minutes2;
+        }
+      
+        return hours1 - hours2;
+      };
+
     const [driverTrips, setDriverTrips] = useState([]);
+    const [driverTrips_, setDriverTrips_] = useState([]);
+    const [selectedNhaxeOption, setSelectedNhaxeOption] = useState('');
+
+    const [nhaXe, setNhaXe] = useState([])
+
+
 
     const fectdatagetDriverTripByDateAndLocateAll = async () =>{
         try {
           const data = await DriverTripAPI.getByDateLocateAll(locatestart,locateend,dateformat);
           setDriverTrips(data)
+          setDriverTrips_(data)
+        for (let i = 0; i < data.length; i++) {
+            const currentItem = data[i];
+            const datatemp = {
+                phone: currentItem.trip.phoneCompany.phone,
+                name: currentItem.trip.phoneCompany.name
+            };
+
+            // Check if the item already exists in the state
+            const itemExists = nhaXe.some(item => item.phone == datatemp.phone);
+
+            if (!itemExists) {
+                // If the item doesn't exist, update the state
+                setNhaXe((prevState) => [...prevState, datatemp]);
+            }
+            }
+
+
+          console.log(nhaXe)
         } catch (error) {
           console.error('Error fetching data:', error);
         }
       }
       useEffect(() => {
         fectdatagetDriverTripByDateAndLocateAll();
-      },[]);
+    }, [locatestart, locateend, dateformat]);
+
+    const handleChangeNhaxe = (event) => {
+        const selectedValue = event.target.value;
+        setSelectedNhaxeOption(event.target.value);
+
+        let sortedData = [...driverTrips_]; 
+        const selectedItems = sortedData.filter(item => item.trip.phoneCompany.phone === selectedValue);
+        setDriverTrips(selectedItems);
+      };
+      
+
 
     return ( 
         <Container fluid={true}>
             <Row>
-                <Search/>
+                <Search  onSearch={handleClickSearch}/>
             </Row>
             <Row className="bg-transparent">
                 <Col lg={3}>
@@ -122,27 +200,21 @@ function ListInfoTrip() {
                         <h1 className="fw-bold fs-1">tìm theo nhà xe</h1>
 
                         <ul>
-                            <li>
-                                <input 
-                                    
+                        {nhaXe.map((item, index) => (
+                            <li key={index}>
+                            <input
                                 type='radio'
-                                id='radio11'
-                                value='1'
-
-                                />
-                                <label className="ml-2 fs-3" htmlFor='radio11'>Mặc Định</label>
+                                id={`radioNhaxe${index}`}
+                                value={item.phone}
+                                onChange={handleChangeNhaxe}
+                                checked={selectedNhaxeOption === item.phone}
+                            />
+                            <label className="ml-2 fs-3" htmlFor={`radioNhaxe${index}`}>{item.name}</label>
                             </li>
-                            <li>
-                                <input 
-                                    
-                                type='radio'
-                                id='radio22'
-                                value='2'
+                        ))}
+                        </ul>
 
-                                />
-                                <label className="ml-2 fs-3" htmlFor='radio22'>Đi Sớm Nhất</label>
-                            </li>
-                            </ul>
+
                     </div>
                 </Col>
                 <Col lg={8}>

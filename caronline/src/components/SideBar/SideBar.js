@@ -1,13 +1,33 @@
 import React, { useState } from "react";
 import Button from '~/components/Button';
 import config from "~/config";
+import { useNavigate } from "react-router-dom";
 import Cookies from 'js-cookie';
 
 export default function Sidebar() {
+    const navigate = useNavigate();
     const companyCookie = Cookies.get('company');
     const companyName = companyCookie ? JSON.parse(companyCookie).name : '';
     const role = Cookies.get('role');
     const roleName = role ? role : '';
+
+    const handleLogout = () => {
+        // Thực hiện các công việc đăng xuất ở đây, ví dụ: xóa cookies
+        Cookies.remove('phone');
+        Cookies.remove('dropoff');
+        Cookies.remove('role');
+        Cookies.remove('email');
+        Cookies.remove('pickup');
+        Cookies.remove('driverTrip');
+        Cookies.remove('refresh_token');
+        Cookies.remove('formData');
+        Cookies.remove('access_token');
+        Cookies.remove('company');
+        // Đóng modal
+        alert("Đăng xuất thành công!")
+        navigate('/managementstaff/logincompany')
+      };
+
     return (
         <div className="flex w-full ">
 
@@ -122,7 +142,7 @@ export default function Sidebar() {
                                     )}
                             
 
-                            <li className="m-2 p-2 bg-violet-500 hover:bg-violet-600 active:bg-violet-700 focus:outline-none focus:ring focus:ring-violet-300 text-white rounded-sm">
+                            <li onClick={handleLogout} className="m-2 p-2 bg-violet-500 hover:bg-violet-600 active:bg-violet-700 focus:outline-none focus:ring focus:ring-violet-300 text-white rounded-sm">
                                 <a
                                     href="#"
                                     className="flex items-center p-2 space-x-3 rounded-md"
@@ -141,7 +161,7 @@ export default function Sidebar() {
                                             d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
                                         />
                                     </svg>
-                                    <span className="text-2xl">Logout</span>
+                                    <span  className="text-2xl">Logout</span>
                                 </a>
                             </li>
                         </ul>

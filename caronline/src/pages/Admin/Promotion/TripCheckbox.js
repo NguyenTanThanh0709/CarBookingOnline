@@ -12,7 +12,7 @@ function TripCheckbox({ trip, selectedTrips, handleCheckboxChange }) {
         className="mr-2"
         checked={selectedTrips.includes(trip.id)}
       />
-      <label htmlFor={`trip_${trip.id}`}>{trip.location}</label>
+      <label htmlFor={`trip_${trip.id}`}>{trip.pickupLocation} - {trip.dropoffLocation} -- ({trip.pickupTime} - {trip.dropoffTime})</label>
     </div>
   );
 }

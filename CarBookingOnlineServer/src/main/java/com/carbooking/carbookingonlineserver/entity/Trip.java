@@ -57,5 +57,6 @@ public class Trip {
 
     @ManyToOne
     @JoinColumn(name = "PromotionsID")
+    @JsonIgnore
     private Promotions promotion;
 }

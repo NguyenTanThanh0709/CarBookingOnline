@@ -22,6 +22,30 @@ public class MailService implements IMailService {
     public static final String UTF_8_ENCODING = "UTF-8";
 
     private final String fromEmail = "lekhanhuyenn.12@gmail.com";
+
+    @Override
+    public void senMailRenfund(String to) {
+        try {
+
+            String text = "Vé của bạn hủy thành công! cảm ơn bạn vì đã sử dụng" +
+                    "dịch vụ của tôi!" +
+                    " hy vọng bạn sẽ sớm quay trở lại";
+
+
+            MimeMessage message = getMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, UTF_8_ENCODING);
+            helper.setPriority(1);
+            helper.setSubject("BẠN ĐÃ HỦY VÉ THÀNH CÔNG ");
+            helper.setFrom(fromEmail);
+            helper.setTo(to);
+            helper.setText(text, true);
+            emailSender.send(message);
+        } catch (Exception exception) {
+            System.out.println(exception.getMessage());
+            throw new RuntimeException(exception.getMessage());
+        }
+    }
+
     @Override
     @Async
     public void sendHtmlEmail(String picup, String dropoff, String date,String price, String to) {
@@ -38,6 +62,27 @@ public class MailService implements IMailService {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, UTF_8_ENCODING);
             helper.setPriority(1);
             helper.setSubject(EMAIL_SUBJECT);
+            helper.setFrom(fromEmail);
+            helper.setTo(to);
+            helper.setText(text, true);
+            emailSender.send(message);
+        } catch (Exception exception) {
+            System.out.println(exception.getMessage());
+            throw new RuntimeException(exception.getMessage());
+        }
+    }
+
+    @Override
+    public void sendMailPassword(String Pass, String to ) {
+        try {
+
+            String text = "Mật Khẩu Khôi Phục Của Bạn Là: " + Pass;
+
+
+            MimeMessage message = getMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, UTF_8_ENCODING);
+            helper.setPriority(1);
+            helper.setSubject("KHÔI PHỤC MẬT KHẨU THÀNH CÔNG!");
             helper.setFrom(fromEmail);
             helper.setTo(to);
             helper.setText(text, true);

@@ -7,10 +7,7 @@ import com.carbooking.carbookingonlineserver.entity.*;
 import com.carbooking.carbookingonlineserver.repository.DriverTripRepository;
 import com.carbooking.carbookingonlineserver.repository.UserDriverTripRepository;
 import com.carbooking.carbookingonlineserver.repository.UserRepository;
-import com.carbooking.carbookingonlineserver.service.CarService;
-import com.carbooking.carbookingonlineserver.service.DriverTripService;
-import com.carbooking.carbookingonlineserver.service.TripService;
-import com.carbooking.carbookingonlineserver.service.UserService;
+import com.carbooking.carbookingonlineserver.service.*;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -21,6 +18,8 @@ import org.springframework.stereotype.Service;
 
 import javax.swing.*;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -47,23 +46,10 @@ public class ImplDriverTrip implements DriverTripService {
     private UserDriverTripService userDriverTripService;
 
     @Autowired
+    private  TypeCarService typeCarService;
+
+    @Autowired
     private  UserDriverTripRepository userDriverTripRepository;
-    private boolean checkDriver(String[] phoneUsers){
-        if(phoneUsers == null){
-            return true;
-        }
-        for(String phone: phoneUsers){
-            User user = userService.findByPhone(phone);
-            if(user != null){
-                if(!user.getRole().equals(Role.DRIVER) || user.getLicenseNumber() == null){
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-
 
     private void AddDriverForDriverTrip(String[] drivers, DriverTrip driverTrip){
         for(String driver: drivers){
@@ -92,9 +78,7 @@ public class ImplDriverTrip implements DriverTripService {
     @Override
     public DriverTrip addOneTrip(DriverTripRequest driverTripRequest) {
         String[] listDriver = driverTripRequest.getDrivers().split("-");
-        if(!checkDriver(listDriver)){
-            return null;
-        }
+
         DriverTrip driverTrip = mapper.map(driverTripRequest,DriverTrip.class) ;
         Trip trip = tripService.getTripById(driverTripRequest.getIdtrip());
         Car car = carService.getCarById(driverTripRequest.getIdcar());
@@ -137,9 +121,7 @@ public class ImplDriverTrip implements DriverTripService {
     @Transactional
     public DriverTrip  editOneTrip(Long id, DriverTripRequest driverTripRequest) {
         String[] listDriver = driverTripRequest.getDrivers().split("-");
-        if(!checkDriver(listDriver)){
-            return null;
-        }
+
         driverTripRequest.setId(id);
         Optional<DriverTrip> optionalDriverTrip = driverTripRepository.findById(id);
 
@@ -148,7 +130,6 @@ public class ImplDriverTrip implements DriverTripService {
 
             driverTrip.setStatus(driverTripRequest.getStatus());
             driverTrip.setDate(driverTripRequest.getDate());
-
 
 
             Car car = carService.getCarById(driverTripRequest.getIdcar());
@@ -204,9 +185,7 @@ public class ImplDriverTrip implements DriverTripService {
         List<DriverTrip> listsaved = new ArrayList<>();
         for(DriverTripRequest driverTripRequest : list_){
             String[] listDriver = driverTripRequest.getDrivers().split("-");
-            if(!checkDriver(listDriver)){
-                return null;
-            }
+
             DriverTrip driverTrip = mapper.map(driverTripRequest, DriverTrip.class);
             Trip trip = tripService.getTripById(driverTripRequest.getIdtrip());
             Car car = carService.getCarById(driverTripRequest.getIdcar());
@@ -296,6 +275,57 @@ public class ImplDriverTrip implements DriverTripService {
     @Override
     public void deleteSeat(Long id) {
         driverTripRepository.deleteDriverTripSeatBySeatId(id);
+    }
+
+    @Override
+    public List<DriverTrip> addListBetweenDay(String phoneCompany, Long idTrip, String start, String end, Long typecar) {
+        Trip trip = tripService.getTripById(idTrip);
+        TypeCar typeCar = typeCarService.GetTypecar(typecar);
+        if(trip == null || typeCar == null){
+            return null;
+        }
+        List<Car> cars  = carService.getAllByTypeAndCompany(typecar,phoneCompany);
+
+        String[] startDay = start.split("/");
+        String[] endDay =  end.split("/");
+
+        LocalDate startDate = LocalDate.of(Integer.parseInt(startDay[2]), Integer.parseInt(startDay[0]), Integer.parseInt(startDay[1]));
+        LocalDate endDate = LocalDate.of(Integer.parseInt(endDay[2]), Integer.parseInt(endDay[0]), Integer.parseInt(endDay[1]));
+
+        LocalDate currentDate = startDate;
+        List<DriverTrip> list = new ArrayList<>();
+        while (!currentDate.isAfter(endDate)) {
+            Date date = Date.from(currentDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+            DriverTrip driverTrip = new DriverTrip();
+            driverTrip.setTrip(trip);
+            driverTrip.setDate(date);
+            driverTrip.setStatus(true);
+
+            Car carTemp = null;
+            for (Car car : cars){
+                if(driverTripRepository.existsByCarAndDate(car,date)) {
+                    continue;
+                }else {
+                    carTemp = car;
+                    break;
+                }
+            }
+            if(carTemp == null){
+                continue;
+            }
+            driverTrip.setCar(carTemp);
+
+
+            DriverTrip driverTrip1 = driverTripRepository.save(driverTrip);
+            String[] listDriver = {"444444444"};
+            this.AddDriverForDriverTrip(listDriver,driverTrip1);
+            list.add(getOne(driverTrip1.getId())) ;
+
+            currentDate = currentDate.plusDays(1);
+        }
+
+        return list;
     }
 
 

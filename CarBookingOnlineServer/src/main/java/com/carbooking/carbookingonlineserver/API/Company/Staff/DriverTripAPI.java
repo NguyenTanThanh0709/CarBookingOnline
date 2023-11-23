@@ -2,6 +2,7 @@ package com.carbooking.carbookingonlineserver.API.Company.Staff;
 import com.carbooking.carbookingonlineserver.dto.Role;
 import com.carbooking.carbookingonlineserver.dto.repuest.AddListDriverForTripRequest;
 import com.carbooking.carbookingonlineserver.dto.repuest.DriverTripRequest;
+import com.carbooking.carbookingonlineserver.dto.repuest.ListDriverTripDTO;
 import com.carbooking.carbookingonlineserver.entity.Car;
 import com.carbooking.carbookingonlineserver.entity.DriverTrip;
 import com.carbooking.carbookingonlineserver.entity.Trip;
@@ -235,6 +236,24 @@ public class DriverTripAPI {
         List<User> list = new ArrayList<>();
         list = userService.getAllEmployeeByCompanyAndRole(role,phoneCompany);
         return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
+    @PostMapping("/addListBetweenDay")
+    public ResponseEntity<List<DriverTrip>> addListBetweenDay(@RequestBody ListDriverTripDTO requestDTO) {
+        List<DriverTrip> result = driverTripService.addListBetweenDay(
+                requestDTO.getPhoneCompany(),
+                requestDTO.getIdTrip(),
+                requestDTO.getStart(),
+                requestDTO.getEnd(),
+                requestDTO.getTypecar()
+        );
+
+        if (result != null && !result.isEmpty()) {
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } else {
+            // You can customize the response status and message based on your requirements
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
     }
 
 

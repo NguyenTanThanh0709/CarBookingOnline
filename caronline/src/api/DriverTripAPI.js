@@ -49,6 +49,18 @@ const DriverTripAPI = {
     getByDateLocateAll : (locatestart,locateend,date) =>{
         const url = `/api/v1/user/drivertrip/listbydate?locatestart=${locatestart}&locateend=${locateend}&date=${date}`;
         return axiosClient.get(url);
+    },
+    addAutomatic :(body) =>{
+        const url = `/api/v1/staff/addListBetweenDay`;
+        return axiosClient.post(url,body);
+    },
+    postpromotion:(body) =>{
+        const url = `/api/v1/staff/promotion`;
+        return axiosClient.post(url,body);
+    },
+    getPromotionList: (phonecomapany) => {
+        const url = `/api/v1/staff/promotion/company/${phonecomapany}`;
+        return axiosClient.get(url);
     }
 }
 

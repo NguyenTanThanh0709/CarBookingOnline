@@ -159,25 +159,31 @@ function SetupTrip() {
     };
     
     const confirmDelete = () => {
+
         const jsonString = JSON.stringify(formData);
         Cookies.set("formData", jsonString);
 
-        const jsonString1 = JSON.stringify(driverTrip);
-        Cookies.set("driverTrip", jsonString1);
-
-        console.log(formData)
-        console.log(driverTrip)
-
-
         const pickup = driverTrip.trip.pickupLocations.find(item => item.id == formData.idPickUp);
         const dropoff = driverTrip.trip.dropoffLocations.find(item => item.id == formData.idDropOff);
-
         const pickup1 = JSON.stringify(pickup);
         Cookies.set("pickup", pickup1);
 
         const dropoff1 = JSON.stringify(dropoff);
         Cookies.set("dropoff", dropoff1);
+        const driverTripTEMP = driverTrip;
 
+
+        const jsonString1 = JSON.stringify(driverTrip.trip);
+        Cookies.set("driverTrip", jsonString1);
+
+        const jsonString2 = JSON.stringify(driverTrip.date);
+        Cookies.set("date", jsonString2);
+
+
+        // console.log(pickup)
+        // console.log(dropoff)
+
+        console.log("Driver Trip Cookie:",driverTrip.trip);
 
         closeDeleteModal();
 
