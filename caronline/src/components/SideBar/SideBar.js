@@ -105,7 +105,7 @@ export default function Sidebar() {
                                     <Button to={config.routes.Promotion} className="text-2xl">Khuyến Mãi</Button>
                                 </a>
                             </li>
-                            {roleName === 'OWNER' ? (
+
                             <li className="m-2 p-2 bg-violet-500 hover:bg-violet-600 active:bg-violet-700 focus:outline-none focus:ring focus:ring-violet-300 text-white rounded-sm">
                                 <a
                                     href="#"
@@ -133,13 +133,16 @@ export default function Sidebar() {
                                     
                                     
                                     
-                                    <Button to={config.routes.ManagementStaff} className="text-2xl">Quản lý cấp cao</Button>
-                                    
+                                    <Button to={config.routes.ManagementStaff} className="text-2xl">
+                                        Quản lý cấp cao
+                                    </Button>
+
+
+                                                                    
                                 </a>
                             </li>
-                                ) : (
-                                    null
-                                    )}
+
+   
                             
 
                             <li onClick={handleLogout} className="m-2 p-2 bg-violet-500 hover:bg-violet-600 active:bg-violet-700 focus:outline-none focus:ring focus:ring-violet-300 text-white rounded-sm">
@@ -161,7 +164,7 @@ export default function Sidebar() {
                                             d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
                                         />
                                     </svg>
-                                    <span  className="text-2xl">Logout</span>
+                                    <span  className="text-2xl">Đăng xuất</span>
                                 </a>
                             </li>
                         </ul>

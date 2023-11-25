@@ -51,6 +51,11 @@ return JSON.stringify(jsonObject);
       
       const token = response.access_token;
       console.log(response);
+      if(response.role != "ADMIN"){
+        alert("Đây là trang ADMIN bạn không được vào!");
+        navigate('/');
+        return;
+    }
       Cookies.set('access_token', token, { expires: 7 });
       Cookies.set('refresh_token', response.refresh_token, { expires: 7 });
       Cookies.set('role', response.role, { expires: 7 });

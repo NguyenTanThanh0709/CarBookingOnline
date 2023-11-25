@@ -204,7 +204,7 @@ function FormAddEmployee() {
             type="tel"
             placeholder="Phone Number"
             required
-            readOnly ={true}
+            readOnly ={status === 'see' ? true:false}
 
             name="phone"
             value={formData.phone}
@@ -322,7 +322,7 @@ function FormAddEmployee() {
 
         <div className="flex items-center justify-between">
 
-        {status === 'add' && (
+        {status === 'add' && Cookies.get('role') === 'OWNER' && (
                   <button
                   onClick={handleAdd_}
                     className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
@@ -339,7 +339,7 @@ function FormAddEmployee() {
                     Bạn đang xem thông tin nhân viên
                   </button>
                 )}
-                {status === 'edit' && (
+                {status === 'edit' && Cookies.get('role') === 'OWNER' && (
                   <button
                   onClick={edit}
                     className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"

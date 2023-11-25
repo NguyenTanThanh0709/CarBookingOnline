@@ -21,6 +21,8 @@
     "firebase": "^10.4.0",
     "flowbite-react": "^0.6.4",
     "js-cookie": "^3.0.5",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.7.1",
     "mdb-react-ui-kit": "^6.1.0",
     "normalize.css": "^8.0.1",
     "query-string": "^8.1.0",

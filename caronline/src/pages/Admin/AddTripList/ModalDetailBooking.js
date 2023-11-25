@@ -1,16 +1,25 @@
 import { useState, useEffect } from 'react';
 import BookingAPI from '~/api/BookingAPI';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+
 
 function ModalDetailBooking(props) {
     const [listBooking, setListBooking] = useState([]);
     const oneDriverTrip = props.data
-    
+    const [cost, setCost] = useState(0);
     
     const fecthDataBooking = async (id) => {
         try {
             const data = await BookingAPI.getlist(id);
             setListBooking(data)
             console.log(data)
+            let costTemp = 0;
+            for (let i = 0; i < data.length; i++) {
+                // Access each integer using arrayOfIntegers[i]
+                costTemp  = costTemp + data[i].fareAmount;
+              }
+              setCost(costTemp);
           } catch (error) {
             console.error('Error fetching data:', error);
           }
@@ -18,6 +27,45 @@ function ModalDetailBooking(props) {
     useEffect(() => {
         fecthDataBooking(oneDriverTrip.id);
       },[]);
+
+
+
+      const generatePDF = (id) => {
+        const pdfDoc = new jsPDF();
+        const fontPath = 'Kanit'; // Replace with the correct path
+    pdfDoc.addFileToVFS('arial-unicode-ms.ttf', fontPath);
+    pdfDoc.addFont('arial-unicode-ms.ttf', 'Arial Unicode MS', 'normal');
+    pdfDoc.setFont('Arial Unicode MS', 'normal');
+
+  pdfDoc.text('Your bus ticket is here! Wishing you a pleasant journey.', 10, 10);
+
+  const selectedBooking = listBooking.find(item => item.id === id);
+
+  if (selectedBooking) {
+    const lines = [
+      `Customer name: ${selectedBooking.user.name}`,
+      `Email: ${selectedBooking.user.email}`,
+      `Phone number: ${selectedBooking.user.phone}`,
+      `Price: ${selectedBooking.fareAmount}`,
+      `Car: ${selectedBooking.car.licenseplates} - ${selectedBooking.car.name}`,
+      `Pick-up location: ${selectedBooking.locationDetailPickUp ? selectedBooking.locationDetailPickUp.detailLocation : ''}`,
+      `Drop-off location: ${selectedBooking.locationDetailDropOff ? selectedBooking.locationDetailDropOff.detailLocation : ''}`
+    ];
+
+    // Add seats information
+    lines.push(`Chỗ ngồi: ${selectedBooking.seats.map(item => item.name).join(', ')}`);
+
+    // Add lines to PDF
+    let yOffset = 20; // Initial Y-coordinate
+    lines.forEach(line => {
+      pdfDoc.text(line, 10, yOffset);
+      yOffset += 10; // Adjust the Y-coordinate for the next line
+    });
+  }
+
+  pdfDoc.save('sample.pdf');
+      };
+      
     return ( 
         <div>
             <div className="p-4 bg-white rounded-lg shadow-md">
@@ -57,7 +105,7 @@ function ModalDetailBooking(props) {
                 </div>
                 <div className="flex my-2">
                 <p className="w-1/4">Tổng tiền thu được:</p>
-                <p>1000000</p>
+                <p>{cost}</p>
                 </div>
             </div>
             <div className="p-4 bg-white rounded-lg shadow-md my-4">
@@ -72,7 +120,9 @@ function ModalDetailBooking(props) {
                         <th className="px-4 py-2">isProtect</th>
                         <th className="px-4 py-2">Điểm đón</th>
                         <th className="px-4 py-2">Điểm trả</th>
+                        <th className="px-4 py-2">Trạng thái</th>
                         <th className="px-4 py-2">Danh sách chỗ</th>
+                        <th className="px-4 py-2">In vé</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -94,7 +144,9 @@ function ModalDetailBooking(props) {
                              <>{item.locationDetailDropOff.detailLocation}, {item.locationDetailDropOff.time}</>
                         )}
                             </td>
+                            <td className="border px-4 py-2">{item.status}</td>
                             <td className="border px-4 py-2">{item.seats.map(item1 => item1.name).join(', ')}</td>
+                            <td className="border px-4 py-2 cursor-pointer" onClick={() => generatePDF(item.id)}>ấn vào đây để in</td>
 
                         </tr>
 

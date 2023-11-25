@@ -34,6 +34,7 @@ useEffect(() => {
     const handleUpdate = async () => {
         try {
             const bookingData = await AuthenAndAuthorAPI.updateUser(Cookies.get("phone"),name,email);
+            Cookies.set("email", email);
             alert("Cập nhật thành công");
 
           } catch (error) {

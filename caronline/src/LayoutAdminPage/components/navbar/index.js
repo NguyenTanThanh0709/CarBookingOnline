@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useNavigate } from "react-router-dom";
+import Cookies from 'js-cookie';
 
 function Navbar() {
 
@@ -7,6 +9,24 @@ function Navbar() {
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
+  const navigate = useNavigate();
+
+  const logount = () =>{
+    Cookies.remove('phone');
+    Cookies.remove('dropoff');
+    Cookies.remove('role');
+    Cookies.remove('email');
+    Cookies.remove('pickup');
+    Cookies.remove('driverTrip');
+    Cookies.remove('refresh_token');
+    Cookies.remove('formData');
+    Cookies.remove('access_token');
+    Cookies.remove('company');
+    Cookies.remove('date');
+    // Đóng modal
+    alert("Đăng xuất thành công!")
+    navigate('/admin/login')
+  }
 
   return (
     <nav className="bg-gray-800">
@@ -124,9 +144,9 @@ function Navbar() {
             <a href="#" className="block px-4 py-2 text-gray-700" role="menuitem" tabIndex="-1" id="user-menu-item-1">
               Settings
             </a>
-            <a href="#" className="block px-4 py-2 text-gray-700" role="menuitem" tabIndex="-1" id="user-menu-item-2">
+            <span onClick={logount} className="block px-4 py-2 text-gray-700" role="menuitem" tabIndex="-1" id="user-menu-item-2">
               Sign out
-            </a>
+            </span>
           </div>
         )}
 

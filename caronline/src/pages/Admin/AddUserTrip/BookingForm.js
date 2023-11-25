@@ -55,12 +55,13 @@ import BookingAPI from '~/api/BookingAPI';
 
     const fetchDataSubmit = async () => {
       try {
-        const myString = data.listIdSeat;
+        const myString = formData.listIdSeat;
         const wordsArray = myString.split("-");
         const wordCount = wordsArray.length;
-        data.fareAmount = wordCount * data.fareAmount;
+        formData.fareAmount = wordCount * formData.fareAmount;
         const data = await BookingAPI.addOneBooking(formData);
         console.log(data)
+        //console.log('Form submitted with data:', formData);
         alert("Booking Thành Công!")
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -71,7 +72,7 @@ import BookingAPI from '~/api/BookingAPI';
       e.preventDefault();
       const storedUserState = localStorage.getItem('userState');
       formData.listIdSeat = storedUserState;
-      console.log('Form submitted with data:', formData);
+      
       if(isFormDataValid()){
         fetchDataSubmit();
       }else{

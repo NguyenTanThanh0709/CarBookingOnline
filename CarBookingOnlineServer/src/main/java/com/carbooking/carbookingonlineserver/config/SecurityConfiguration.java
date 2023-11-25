@@ -47,7 +47,7 @@ public class SecurityConfiguration {
                                 .requestMatchers(WHITE_LIST_URL).permitAll()
                                 .requestMatchers("/api/v2/admin/**").hasAnyAuthority("ADMIN","OWNER")
                                 .requestMatchers("/api/v1/owner/**").hasAnyAuthority("OWNER","STAFF")
-                                .requestMatchers("/api/v1/staff/**").hasAnyAuthority("STAFF","USER","OWNER")
+                                .requestMatchers("/api/v1/staff/**").hasAnyAuthority("STAFF","USER","OWNER","DRIVER")
                                 .requestMatchers("/api/v1/driver/**").hasAnyAuthority("DRIVER")
                                 .requestMatchers("/api/v1/user/**").hasAnyAuthority("USER","DRIVER","OWNER","STAFF","ADMIN")
                                 .requestMatchers("/api/v1/owner/cars/**").hasAnyAuthority("OWNER","STAFF")

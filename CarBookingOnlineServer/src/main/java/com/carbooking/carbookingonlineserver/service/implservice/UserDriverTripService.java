@@ -1,10 +1,12 @@
 package com.carbooking.carbookingonlineserver.service.implservice;
 
+import com.carbooking.carbookingonlineserver.dto.reponse.DriverTripReponDriver;
 import com.carbooking.carbookingonlineserver.entity.DriverTrip;
 import com.carbooking.carbookingonlineserver.entity.User;
 import com.carbooking.carbookingonlineserver.entity.UserDriverTrip;
 import com.carbooking.carbookingonlineserver.entity.UserDriverTripId;
 import com.carbooking.carbookingonlineserver.repository.UserDriverTripRepository;
+import com.carbooking.carbookingonlineserver.service.UserService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -20,6 +22,9 @@ import java.util.List;
 public class UserDriverTripService {
     @Autowired
     private UserDriverTripRepository userDriverTripRepository;
+
+    @Autowired
+    private UserService userService;
 
     public void removeUserDriverTripByUserAndDriver(User user, DriverTrip driverTrip) {
         userDriverTripRepository.deleteByUserAndDriverTrip(user, driverTrip);
@@ -54,6 +59,37 @@ public class UserDriverTripService {
         }
         return list_;
     }
+
+
+    public List<DriverTripReponDriver> getDriverTripsByUserPhone(String phone) {
+        List<DriverTripReponDriver> list = new ArrayList<>();
+        User user = userService.findByPhone(phone);
+
+        if (user != null) {
+            List<UserDriverTrip> userDriverTrips = userDriverTripRepository.findByUser(user);
+
+            for (UserDriverTrip userDriverTrip : userDriverTrips) {
+                if (userDriverTrip.getDriverTrip() != null) {
+                    DriverTripReponDriver driverTripReponDriver = new DriverTripReponDriver(
+                            userDriverTrip.getDriverTrip().getId(),
+                            userDriverTrip.getDriverTrip().getDate(),
+                            userDriverTrip.getDriverTrip().getStatus(),
+                            userDriverTrip.getDriverTrip().getTrip().getPickupLocation(),
+                            userDriverTrip.getDriverTrip().getTrip().getDropoffLocation(),
+                            userDriverTrip.getDriverTrip().getTrip().getPickupTime(),
+                            userDriverTrip.getDriverTrip().getTrip().getDropoffTime(),
+                            userDriverTrip.getDriverTrip().getCar().getLicenseplates(),
+                            userDriverTrip.getDriverTrip().getCar().getTypeCar().getName(),
+                            userDriverTrip.getDriverTrip().getSeats()
+                    );
+                    list.add(driverTripReponDriver);
+                }
+            }
+        }
+
+        return list;
+    }
+
 
     @Transactional
     public void updateStatusById(UserDriverTripId userDriverTripId, Boolean newStatus) {

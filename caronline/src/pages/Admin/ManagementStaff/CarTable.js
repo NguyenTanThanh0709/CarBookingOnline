@@ -238,13 +238,14 @@ const CarTable = () => {
 
   return (
     <div>
+      {Cookies.get('role') === 'OWNER' &&
       <button
       onClick={handleAdd}
       className="bg-blue-500 m-4 p-4 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded">
         Thêm xe chạy
       </button>
-
-      
+}
+{Cookies.get('role') === 'OWNER' &&
       <div className="flex m-2 p-2 items-center space-x-2">
         <label className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded cursor-pointer">
           <span>Select CSV File</span>
@@ -264,7 +265,7 @@ const CarTable = () => {
           Upload
         </button>
       </div>
-
+ }
       <table className="min-w-full table table-success table-striped">
         <thead>
           <tr>

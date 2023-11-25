@@ -146,7 +146,11 @@ public class vnpayRefund {
                 // Thực hiện các hành động sau khi hoàn tiền thành công
 //                paymentService.UpdateStatusPayment(idbooking,"Hoàn Tiền Thành Công và Hủy Vé!");
                 return "succsess";
-            } else {
+            }else if("99".equals(resultCode)){
+                System.out.println("Hoàn tiền thất bại");
+                // Thực hiện các hành động sau khi hoàn tiền thất bại
+                return "wait";
+            }else {
                 System.out.println("Hoàn tiền thất bại");
                 // Thực hiện các hành động sau khi hoàn tiền thất bại
                 return "fail";

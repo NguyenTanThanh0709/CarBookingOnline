@@ -130,7 +130,9 @@ return JSON.stringify(jsonObject);
     console.log('Registration data:', formData);
     formData.role = 'USER';
     const jsonData = formToJson(new FormData(e.target));
-    AuthenAndAuthorAPI.register(jsonData)
+    console.log(jsonData);
+    console.log(formData)
+    AuthenAndAuthorAPI.register(formData)
     .then((response) => {
       console.log('Registration successful:', response);
       setLoginStatus('successeregister');

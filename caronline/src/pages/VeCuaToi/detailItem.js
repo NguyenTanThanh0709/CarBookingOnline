@@ -88,6 +88,8 @@ function DetailItem() {
           console.log(bookingData);
           if(bookingData == "succsess"){
             alert("Hoàn tiền thành công");
+          }else if(bookingData == "wait"){
+            alert("Vé Hoàn Tiền Của bạn đang được xem xét vui lòng chờ! khi có phản hồi");
           }else{
             alert("Hoàn tiền thất bại");
           }

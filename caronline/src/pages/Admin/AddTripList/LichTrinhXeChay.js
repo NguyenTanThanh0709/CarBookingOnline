@@ -141,6 +141,7 @@ function LichTrinhXeChay() {
   const fetchDataEditOneDriverTrip = async () =>{
     try {
       const data = await DriverTripAPI.editone(formData.id,formData);
+      console.log(formData)
       alert("Chỉnh sửa thành công!")  
       fetchDataListDriverAfterCurrentDate();    
       setFormData({
@@ -203,7 +204,7 @@ function LichTrinhXeChay() {
         date: tripToEdit.date,
         status: tripToEdit.status,
         idtrip: tripToEdit.trip.id,
-        idcar: tripToEdit.car.id,
+        idcar: tripToEdit.car ? tripToEdit.car.id : "",
         drivers: selectedDrivers,
       });
   
@@ -632,8 +633,14 @@ const isFormDataValidUpdate = () => {
               <td className="border px-4 py-2">{format(new Date(item.date), "yyyy-MM-dd HH:mm:ss")}</td>
               <td className="border px-4 py-2">{item.status ? 'Active' : 'Inactive'}</td>
               <td className="border px-4 py-2">{item.trip.pickupLocation} đến {item.trip.dropoffLocation} -- Giờ đi: {item.trip.pickupTime} -- Giờ đến: {item.trip.dropoffTime}</td>
-              <td className="border px-4 py-2">{item.car.id}</td>
-              <td className="border px-4 py-2">{item.userDriverTrips ? item.userDriverTrips.map(item1 => item1.user.name).join(', ') : ""}</td>
+              <td className="border px-4 py-2">{item.car ? item.car.id : ""}</td>
+              <td className="border px-4 py-2">{item.userDriverTrips
+  ? item.userDriverTrips
+      .filter(item1 => item1.user?.name !== "Tài Xế") // Filter out items where user.name is "Tài Xế"
+      .map(item1 => item1.user?.name)
+      .join(', ')
+  : ""}
+</td>
               <td className="border px-4 py-2">
               <>
                     <button

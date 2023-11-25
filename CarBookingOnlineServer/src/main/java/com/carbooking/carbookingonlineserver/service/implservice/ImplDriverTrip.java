@@ -64,6 +64,9 @@ public class ImplDriverTrip implements DriverTripService {
     @Override
     public  Boolean checkExistDriverFordate(String[] drivers, Date date){
         for (String phone: drivers){
+            if(phone.equals("444444444")){
+                continue;
+            }
             User user = userService.findByPhone(phone);
             if(user == null){
                 return false;
@@ -143,6 +146,7 @@ public class ImplDriverTrip implements DriverTripService {
             if(driverTripRepository.existsByCarAndDateAndDifferentId(car,driverTripRequest.getDate(),id)){
                 return  null;
             }
+
             if(checkExistDriverFordate(listDriver,driverTripRequest.getDate()) == false){
                 return  null;
             }

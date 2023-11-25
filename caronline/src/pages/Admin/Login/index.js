@@ -22,6 +22,13 @@ function Login() {
         AuthenAndAuthorAPI.authenticate(formLogin)
         .then((response) => {
             console.log(response);
+            if(response.role == "OWNER" || response.role == "STAFF"){
+                console.log("OK");
+            }else{
+                alert("Đây là trang của nhà xe bạn không được vào!");
+                navigate('/');
+                return;
+            }
             Cookies.set('access_token', response.access_token, { expires: 7});
             Cookies.set('refresh_token', response.refresh_token, { expires: 7 });
             Cookies.set('role', response.role, { expires: 7 });

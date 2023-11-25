@@ -20,6 +20,8 @@ public interface UserDriverTripRepository extends JpaRepository<UserDriverTrip, 
     @Query("DELETE FROM UserDriverTrip udt WHERE udt.driverTrip.id = :driverTripId")
     void deleteByDriverTripId(@Param("driverTripId") Long driverTripId);
 
+    List<UserDriverTrip> findByUser(User user);
+
     @Transactional
     List<UserDriverTrip> findByDriverTrip(DriverTrip driverTrip);
     @Transactional
